@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 class PagamentoController {
 
 	private PagamentoRepository pagamentoRepo;
+	private PedidoRestClient pedidoClient;
 
 	@GetMapping("/{id}")
 	public PagamentoDto detalha(@PathVariable Long id) {
@@ -42,6 +43,10 @@ class PagamentoController {
 		Pagamento pagamento = pagamentoRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
 		pagamento.setStatus(Pagamento.Status.CONFIRMADO);
 		pagamentoRepo.save(pagamento);
+		
+		Long pedidoId = pagamento.getPedidoId();
+		pedidoClient.avisaQueFoiPago(pedidoId);
+		
 		return new PagamentoDto(pagamento);
 	}
 
